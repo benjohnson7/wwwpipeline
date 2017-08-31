@@ -1,11 +1,17 @@
-pages:
-  stage: deploy
+deploy:
+  image: python:latest
   script:
-  - mkdir .public
-  - cp -r * .public
-  - mv .public public
+  - pip install awscli
+  - aws s3 cp ./ s3://$S3_BUCKET_NAME/ --recursive --exclude "*" --include "*.html"
+  only:
+  - master
+pages:
+  image: alpine:latest
+  script:
+  - mkdir -p ./public
+  - cp ./*.html ./public/
   artifacts:
     paths:
     - public
   only:
-  - master
+  - review
